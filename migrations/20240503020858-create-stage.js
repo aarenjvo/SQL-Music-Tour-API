@@ -2,27 +2,15 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('bands', {
-      band_id: {
+    await queryInterface.createTable('stage', {
+      stage_id: {
         allowNull: false,
-        autoIncrement: true,
+        type: Sequelize.INTEGER,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        autoIncrement: true
       },
-      name: {
+      stage_name: {
         type: Sequelize.STRING,
-        allowNull: false
-      },
-      genre: {
-        type: Sequelize.TEXT,
-        allowNull: false
-      },
-      available_start_time: {
-        type: Sequelize.DATE,
-        allowNull: false
-      },
-      end_time: {
-        type: Sequelize.DATE,
         allowNull: false
       }
       // createdAt: {
@@ -36,6 +24,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('bands');
+    await queryInterface.dropTable('stage');
   }
 };

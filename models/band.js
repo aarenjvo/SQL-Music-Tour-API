@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
         band_id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: true,
+            allowNull: false
         },
         name: {
             type: DataTypes.STRING,
@@ -33,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         end_time: {
             type: DataTypes.DATE,
+            allowNull: false
         }
     }, {
         sequelize,
