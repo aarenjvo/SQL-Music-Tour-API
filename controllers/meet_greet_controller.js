@@ -7,9 +7,9 @@ const { Op } = require('sequelize')
 meetGreet.get('/', async (req, res) => {
     try {
         const findMeets = await MeetGreet.findAll({
-            order: [ [ 'meet_start_time', 'ASC' ] ],
+            order: [ [ 'event_id', 'ASC' ] ],
             where: {
-                name: { [Op.like]: `%${req.query.name ? req.query.name : ''}%`}
+                event_id: req.query.id ? req.query.id : { [Op.ne]: null }
             }
         })
         res.status(200).json(findMeets)
@@ -17,6 +17,7 @@ meetGreet.get('/', async (req, res) => {
         res.status(500).json(error)
     }
 })
+
 
 // FIND A SPECIFIC MEET & GREET
 meetGreet.get('/:id', async (req, res) => {

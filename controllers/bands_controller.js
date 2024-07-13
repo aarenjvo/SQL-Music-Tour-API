@@ -1,7 +1,7 @@
 // DEPENDENCIES
 const bands = require('express').Router()
 const db = require('../models')
-const { Band, MeetGreet, Event } = db
+const { Band, MeetGreet, Event, SetTime } = db
 const { Op } = require('sequelize')
 
 // FIND ALL BANDS
@@ -9,7 +9,7 @@ bands.get('/', async (req, res) => {
     try {
         const { id } = req.params
         const foundBands = await Band.findAll({
-            order: [ [ 'available_start_time', 'ASC' ] ],
+            order: [['available_start_time', 'ASC']],
             where: {
                 name: { [Op.like]: `%${req.query.name ? req.query.name : ''}%` }
             }
@@ -20,11 +20,35 @@ bands.get('/', async (req, res) => {
     }
 })
 
-// FIND A SPECIFIC BAND
+// FIND A SPECIFIC BAND BY ID
 bands.get('/:id', async (req, res) => {
     try {
         const foundBand = await Band.findOne({
-            where: { id: req.params.id }
+            where: { id: req.params.id },
+            include: [
+                {
+                    model: MeetGreet,
+                    as: 'meet_greet',
+                    include: {
+                        model: Event,
+                        as: 'event',
+                        where: { name: { [Op.like]: `%${req.query.event ? req.query.event : ''}%` } },
+                        attributes: { exclude: ['event_id'] }
+                    },
+                    attributes: { exclude: ['band_id', 'event_id'] }
+                },
+                {
+                    model: SetTime,
+                    as: 'set_time',
+                    include: {
+                        model: Event,
+                        as: 'event',
+                        where: { name: { [Op.like]: `%${req.query.event ? req.query.event : ''}%` } },
+                        attributes: { exclude: ['event_id'] }
+                    },
+                    attributes: { exclude: ['band_id', 'event_id'] }
+                }
+            ]
         })
         res.status(200).json(foundBand)
     } catch (error) {
@@ -32,14 +56,37 @@ bands.get('/:id', async (req, res) => {
     }
 })
 
-// FIND A SPECIFIC BAND
-bands.get('/:name', async (req, res) => {
+// FIND A SPECIFIC BAND BY NAME
+bands.get('/name/:name', async (req, res) => {
     try {
-        const foundBand = await Band.findOne({
+        const foundBandByName = await Band.findOne({
             where: { name: req.params.name },
-            include: { model: MeetGreet, as: 'meet_greet' }
+            include: [
+                {
+                    model: MeetGreet,
+                    as: 'meet_greet',
+                    include: {
+                        model: Event,
+                        as: 'event',
+                        where: { name: { [Op.like]: `%${req.query.event ? req.query.event : ''}%` } },
+                        attributes: { exclude: ['event_id'] }
+                    },
+                    attributes: { exclude: ['band_id', 'event_id'] }
+                },
+                {
+                    model: SetTime,
+                    as: 'set_time',
+                    include: {
+                        model: Event,
+                        as: 'event',
+                        where: { name: { [Op.like]: `%${req.query.event ? req.query.event : ''}%` } },
+                        attributes: { exclude: ['event_id'] }
+                    },
+                    attributes: { exclude: ['band_id', 'event_id'] }
+                }
+            ]
         })
-        res.status(200).json(foundBand)
+        res.status(200).json(foundBandByName)
     } catch (error) {
         res.status(500).json(error)
     }
@@ -53,7 +100,7 @@ bands.post('/', async (req, res) => {
             message: 'Successfully inserted a new band',
             data: newBand
         })
-    } catch(err) {
+    } catch (err) {
         res.status(500).json(err)
     }
 })
@@ -63,13 +110,13 @@ bands.put('/:id', async (req, res) => {
     try {
         const updatedBands = await Band.update(req.body, {
             where: {
-                band_id: req.params.id
+                id: req.params.id
             }
-            })
-            res.status(200).json({
-                message: `Successfully updated ${updatedBands} band(s)`
-            })
-    } catch(err) {
+        })
+        res.status(200).json({
+            message: `Successfully updated ${updatedBands} band(s)`
+        })
+    } catch (err) {
         res.status(500).json(err)
     }
 })
@@ -79,13 +126,13 @@ bands.delete('/:id', async (req, res) => {
     try {
         const deletedBands = await Band.destroy({
             where: {
-                band_id: req.params.id
+                id: req.params.id
             }
         })
         res.status(200).json({
             message: `Successfully deleted ${deletedBands} band(s)`
         })
-    } catch(err) {
+    } catch (err) {
         res.status(500).json(err)
     }
 })

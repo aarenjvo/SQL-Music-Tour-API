@@ -6,6 +6,7 @@ const bandsController = require('./controllers/bands_controller')
 const eventController = require('./controllers/events_controller')
 const stageController = require('./controllers/stages_controller')
 const meetGreetController = require('./controllers/meet_greet_controller')
+const setTimeController = require('./controllers/set_time_controller')
 
 // CONFIGURATION / MIDDLEWARE
 require('dotenv').config()
@@ -15,6 +16,7 @@ app.use('/bands', bandsController)
 app.use('/events', eventController)
 app.use('/stages', stageController)
 app.use('/meetgreets', meetGreetController)
+app.use('/settimes', setTimeController)
 
 const sequelize = new Sequelize(process.env.PG_URI)
 
